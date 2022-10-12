@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    Animator animator;
     [SerializeField] private float moveSpeed;
     [SerializeField] private float rotateSpeed;
 
@@ -15,6 +17,12 @@ public class PlayerController : MonoBehaviour
     private bool _dragStarted;//Sürükleme başladı mı
     private bool _isMoving;
 
+
+    private void Awake()
+    {
+        animator = gameObject.GetComponent<Animator>();
+    }
+
     private void Update()
     {
         HandlePlayerInput();
@@ -22,6 +30,11 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerInput()
     {
+        if (animator)
+        {
+            animator.SetBool("isRunning",_isMoving);
+        }
+        
         if (Input.touchCount > 0)
         {
             _touch = Input.GetTouch(0);
@@ -38,7 +51,8 @@ public class PlayerController : MonoBehaviour
             {
                 if (_touch.phase == TouchPhase.Moved)//Ekrana dokunup hareket ettiriyor ise;
                 {
-                    _touchDown = _touch.position; 
+                    _touchDown = _touch.position;
+                    
                 }
 
                 if (_touch.phase == TouchPhase.Ended)//Ekrana dokunup elini çekiyor ise;
@@ -54,7 +68,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
+    
     Quaternion CalculateRotation()
     {
         Quaternion temp = Quaternion.LookRotation(CalculateDirection(), Vector3.up);
