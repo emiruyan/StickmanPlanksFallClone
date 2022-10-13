@@ -6,16 +6,16 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Animator animator;
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float rotateSpeed;
+    [SerializeField] private float moveSpeed;//hareket hızı
+    [SerializeField] private float rotateSpeed;//dönüş hızı
 
-    private Touch _touch;//Sadece simulator'de çalışır
+    private Touch _touch;//Sadece simulator'de çalışan bir Touch değişkeni oluşturuyoruz
    
-    private Vector3 _touchDown;
-    private Vector3 _touchUp;
+    private Vector3 _touchDown;//İlk dokunuş
+    private Vector3 _touchUp;//Son dokuşunuş
 
-    private bool _dragStarted;//Sürükleme başladı mı
-    private bool _isMoving;
+    private bool _dragStarted;//Sürükleme başladı mı?
+    private bool _isMoving;//Hareket ediyor mu?
 
 
     private void Awake()
@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandlePlayerInput();
+        PlayerDeath();
     }
 
     private void HandlePlayerInput()
@@ -35,36 +36,36 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isRunning",_isMoving);
         }
         
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0)//touchCount 0'dan büyük ise; (Ekrana dokunma işlemi varsa)
         {
-            _touch = Input.GetTouch(0);
+            _touch = Input.GetTouch(0);//İlk dokunuluan touch bizim tanımladığımız touch'a atandı
          
             if (_touch.phase == TouchPhase.Began)//Dokunma başlıyor ise
             {
-                _dragStarted = true;
-                _isMoving = true;
-                _touchDown = _touch.position;
-                _touchUp = _touch.position;
+                _dragStarted = true;//Sürtünme işledi başladı
+                _isMoving = true;//Hareket başladı
+                _touchDown = _touch.position;//Dokunulan yerin pozisyonunu alıyop Down'a atıyoruz
+                _touchUp = _touch.position;//Dokunulan yerin pozisyonunu alıyop Up'a atıyoruz
             }
 
             if (_dragStarted) //Ekrana parmak sürme işlemi başladıysa;
             {
                 if (_touch.phase == TouchPhase.Moved)//Ekrana dokunup hareket ettiriyor ise;
                 {
-                    _touchDown = _touch.position;
+                    _touchDown = _touch.position;//Hareket ettiği sürece touch.position'u touchDown'a atıyoruz
                     
                 }
 
                 if (_touch.phase == TouchPhase.Ended)//Ekrana dokunup elini çekiyor ise;
                 {
                     _touchDown = _touch.position;
-                    _isMoving = false;
-                    _dragStarted = false;
+                    _isMoving = false;//Karakter hareket etmiyor
+                    _dragStarted = false;//Sürtünme bitti
                 }
 
                 gameObject.transform.rotation = Quaternion.RotateTowards(transform.rotation, CalculateRotation(),
-                    rotateSpeed * Time.deltaTime);
-                gameObject.transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+                    rotateSpeed * Time.deltaTime);//Player'ın nereden nereye döeneceği
+                gameObject.transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);//Player hareketi  
             }
         }
     }
@@ -78,8 +79,17 @@ public class PlayerController : MonoBehaviour
     Vector3 CalculateDirection()
     {
         Vector3 temp = (_touchDown - _touchUp).normalized;
-        temp.z = temp.y;
-        temp.y = 0;
+        temp.z = temp.y;//y değerini z'ye atıyoruz
+        temp.y = 0;//y'yi 0'a atıyoruz
         return temp;
+    }
+
+    private void PlayerDeath()
+    {
+        if (transform.localPosition.y <= -3)
+        {
+         GameManager.Instance.PlayAgain();
+                
+        }
     }
 }
