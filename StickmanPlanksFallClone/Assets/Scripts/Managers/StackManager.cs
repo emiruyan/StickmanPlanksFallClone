@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StackManager : MonoBehaviour
@@ -17,7 +14,6 @@ public class StackManager : MonoBehaviour
     { 
       instance = this;
     }
-    
   }
 
 
@@ -40,8 +36,8 @@ public class StackManager : MonoBehaviour
     pickedObject.transform.parent = parent;//Topladığımız objeleri Hierarchy üzerinde ki parent objemize atıyoruz
     Vector3 desPos = prevObject.localPosition;//Sahip olduğumuz objenin localPos'unu desPos'a atıyoruz
     desPos.y += downOrUp ? distanceBetweenObjects : -distanceBetweenObjects;//desPos'un y sini koşula göre arttırıyoruz
-
     pickedObject.transform.localPosition = desPos;//desPos'u topladığımız objenin transformunun localPos'una atıyoruz
     prevObject = pickedObject.transform;//topladığımız objeyi prevObject yapıyoruz (Son Obje)
+    prevObject.localRotation = Quaternion.identity;
   }
 }
